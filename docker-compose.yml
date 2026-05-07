@@ -1,0 +1,149 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: server.py
+    ports:
+      - "8080:8080"
+    volumes:
+      - trustflux_metrics:/app/metrics
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - NUM_CLIENTS=5
+      - NUM_ROUNDS=20
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - AGGREGATION_METHOD=${AGGREGATION_METHOD:-trustflux}
+      - USE_TRUST_SCORING=true
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+      - METRICS_DIR=/app/metrics
+      - EXPERIMENT_NAME=TrustFlux_Run
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('localhost', 8080))"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - fl_net
+
+  client1:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: client.py 0
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+    networks:
+      - fl_net
+
+  client2:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: client.py 1
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+    networks:
+      - fl_net
+
+  client3:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: client.py 2
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+    networks:
+      - fl_net
+
+  client4:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: client.py 3
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+    networks:
+      - fl_net
+
+  client5:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: client.py 4
+    depends_on:
+      server:
+        condition: service_healthy
+    volumes:
+      - ${CHEXPERT_PATH:-./dummy_data}:/data/chexpert:ro
+      - ${ISIC_PATH:-./dummy_data}:/data/isic:ro
+    environment:
+      - DATASET=${DATASET:-synthetic}
+      - USE_SYNTHETIC=${USE_SYNTHETIC:-true}
+      - ATTACK=${ATTACK:-}
+      - MALICIOUS_CLIENT_ID=0
+    networks:
+      - fl_net
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    command: dashboard.py
+    ports:
+      - "8050:8050"
+    volumes:
+      - trustflux_metrics:/app/metrics
+    depends_on:
+      server:
+        condition: service_healthy
+    environment:
+      - METRICS_DIR=/app/metrics
+    networks:
+      - fl_net
+
+networks:
+  fl_net:
+    driver: bridge
+
+volumes:
+  trustflux_metrics:
