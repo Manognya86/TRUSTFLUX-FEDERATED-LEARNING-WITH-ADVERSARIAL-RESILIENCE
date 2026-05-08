@@ -1,6 +1,6 @@
 # 🛡️ TrustFlux — A Federated Learning Framework
 
-> **Trustworthy AI · Term Project**
+> **Trustworthy Artificial Intelligence · Term Project**
 > Secure, privacy-preserving federated learning for medical imaging with Byzantine-robust aggregation, adaptive trust scoring, and cryptographic audit trails.
 
 ---
